@@ -8,8 +8,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Sửa đường dẫn để lưu trực tiếp vào thư mục public của Frontend
-const uploadDir = path.resolve(__dirname, '../../Frontend/public');
+// Lưu ảnh trong thư mục public/images của Backend
+const uploadDir = path.resolve(__dirname, '../public/images');
 
 // Tạo thư mục nếu chưa tồn tại
 if (!fs.existsSync(uploadDir)){
@@ -47,7 +47,15 @@ export const createBook = async (req, res) => {
             stock 
         });
         await book.save();
-        res.status(201).json(book);
+        await book.populate('category');
+        
+        // Format image URL like getBooks
+        const bookData = {
+            ...book._doc,
+            image: book.image ? `/images/${book.image}` : null
+        };
+        
+        res.status(201).json(bookData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -56,8 +64,13 @@ export const createBook = async (req, res) => {
 // Lấy danh sách tất cả sách
 export const getBooks = async (req, res) => {
     try {
-        const book = await Book.find();
-        res.status(200).json(book);
+        const books = await Book.find().populate('category');
+        // Add full image URL to each book
+        const booksWithImages = books.map(book => ({
+            ...book._doc,
+            image: book.image ? `/images/${book.image}` : null
+        }));
+        res.status(200).json(booksWithImages);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -72,7 +85,7 @@ export const getBookById = async (req, res) => {
         }
         const bookData = {
             ...book._doc,
-            image: `/${book.image}`
+            image: book.image ? `/images/${book.image}` : null
         };
         res.status(200).json(bookData);
     } catch (error) {
@@ -99,8 +112,15 @@ export const updateBook = async (req, res) => {
             req.params.id, 
             updateData,
             { new: true }
-        );
-        res.status(200).json(book);
+        ).populate('category');
+        
+        // Format image URL like getBooks
+        const bookData = {
+            ...book._doc,
+            image: book.image ? `/images/${book.image}` : null
+        };
+        
+        res.status(200).json(bookData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

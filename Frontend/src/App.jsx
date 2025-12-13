@@ -15,6 +15,9 @@ import CustomerForm from "./admin/CustomerForm";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
 import AdminOrders from "./admin/AdminOrders";
+import ActivateAccount from "./components/ActivateAccount";
+import PaymentSuccess from "./components/PaymentSuccess";
+import PaymentFailed from "./components/PaymentFailed";
 
 function App() {
   const [authUser, setAuthUser] = useAuth();
@@ -29,6 +32,7 @@ function App() {
             element={authUser ? <Courses /> : <Navigate to="/signup" />}
           />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/activate/:token" element={<ActivateAccount />} />
           <Route path="/book/:id" element={<BookDetail />} />
           <Route path="/admin/books" element={<AdminBooks />} />
           <Route path="/admin/books/new" element={<BookForm />} />
@@ -41,6 +45,8 @@ function App() {
           <Route path="/admin/customers/new" element={<CustomerForm />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/failed" element={<PaymentFailed />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
         </Routes>
         <Toaster />

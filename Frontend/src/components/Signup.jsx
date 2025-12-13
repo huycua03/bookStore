@@ -22,25 +22,37 @@ function Signup() {
       fullname: data.fullname,
       email: data.email,
       phone: data.phone,
-      address: data.address, // Thêm trường address
+      address: data.address,
       password: data.password,
     };
-    await axios
-      .post("http://localhost:4001/api/signup", newCustomer)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data) {
-          toast.success("Signup Successfully");
-          navigate(from, { replace: true });
-        }
-        localStorage.setItem("Customer", JSON.stringify(res.data.customer)); // Đảm bảo tên đúng với backend
-      })
-      .catch((err) => {
-        if (err.response) {
-          console.log(err);
-          toast.error("Error: " + err.response.data.message);
-        }
-      });
+    
+    try {
+      const res = await axios.post("http://localhost:4001/api/signup", newCustomer);
+      
+      if (res.data.requiresActivation) {
+        toast.success("Registration successful! 📧", { duration: 4000 });
+        toast("Please check your email to activate your account", {
+          icon: "✉️",
+          duration: 6000,
+          style: {
+            background: '#3b82f6',
+            color: '#fff',
+          }
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      } else {
+        toast.success("Signup Successfully");
+        localStorage.setItem("customer", JSON.stringify(res.data.customer));
+        navigate(from, { replace: true });
+      }
+    } catch (err) {
+      if (err.response) {
+        console.log(err);
+        toast.error("Error: " + err.response.data.message);
+      }
+    }
   };
 
   return (

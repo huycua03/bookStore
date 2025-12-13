@@ -42,14 +42,34 @@ function Navbar() {
         <a href="/">Home</a>
       </li>
       <li>
-        <a href="/book">Course</a>
+        <a href="/book">Sách</a>
       </li>
-      <li>
-        <a href="/cart">Giỏ hàng</a>
-      </li>
-      <li>
-        <a>About</a>
-      </li>
+      {authUser && (
+        <>
+          <li>
+            <a href="/wishlist">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              Yêu thích
+            </a>
+          </li>
+          <li>
+            <a href="/cart">Giỏ hàng</a>
+          </li>
+        </>
+      )}
     </>
   );
   return (
@@ -148,7 +168,95 @@ function Navbar() {
             </label>
 
             {authUser ? (
-              <Logout />
+              <div className="flex gap-2 items-center">
+                {/* Profile Dropdown */}
+                <div className="dropdown dropdown-end">
+                  <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
+                    <div className="bg-pink-500 text-white rounded-full w-10">
+                      <span className="text-xl">
+                        {authUser.fullname?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </label>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    <li className="menu-title">
+                      <span>{authUser.fullname}</span>
+                    </li>
+                    <li>
+                      <a href="/profile">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                        Tài khoản
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/order-history">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
+                        </svg>
+                        Đơn hàng
+                      </a>
+                    </li>
+                    {authUser.isAdmin && (
+                      <li>
+                        <a href="/admin/books">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          Quản trị
+                        </a>
+                      </li>
+                    )}
+                    <div className="divider my-0"></div>
+                    <li>
+                      <Logout />
+                    </li>
+                  </ul>
+                </div>
+              </div>
             ) : (
               <div className="">
                 <a

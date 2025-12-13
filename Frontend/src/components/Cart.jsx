@@ -70,9 +70,13 @@ function Cart() {
                     <tr key={item._id} className="border-b dark:border-gray-600">
                       <td className="px-6 py-4 flex items-center gap-4">
                         <img 
-                          src={item.image} 
+                          src={`http://localhost:4001${item.image}`}
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/64?text=No+Image';
+                          }}
                         />
                         <span>{item.title}</span>
                       </td>

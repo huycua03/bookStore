@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
+import api from "../config/api";
 
 function AdminCategories() {
   const [categories, setCategories] = useState([]);
@@ -15,7 +15,7 @@ function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/api/category");
+      const res = await api.get("/category");
       setCategories(res.data);
       setLoading(false);
     } catch (error) {
@@ -27,7 +27,7 @@ function AdminCategories() {
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
       try {
-        await axios.delete(`http://localhost:4001/api/category/${id}`);
+        await api.delete(`/category/${id}`);
         fetchCategories(); // Refresh danh sách sau khi xóa
       } catch (error) {
         console.log(error);

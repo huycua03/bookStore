@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
+import api from "../config/api";
 
 function CustomerForm() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ function CustomerForm() {
 
   const fetchCustomer = async () => {
     try {
-      const res = await axios.get(`http://localhost:4001/api/customer/${id}`);
+      const res = await api.get(`/customer/${id}`);
       const { fullname, email, phone, address } = res.data;
       setFormData({ fullname, email, phone, address, password: "" });
     } catch (error) {
@@ -36,9 +36,9 @@ function CustomerForm() {
     try {
       if (id) {
         const { password, ...updateData } = formData;
-        await axios.put(`http://localhost:4001/api/customer/${id}`, updateData);
+        await api.put(`/customer/${id}`, updateData);
       } else {
-        await axios.post("http://localhost:4001/api/customer", formData);
+        await api.post("/customer", formData);
       }
       navigate("/admin/customers");
     } catch (error) {

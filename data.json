@@ -1,0 +1,368 @@
+{
+  "categories": [
+    {
+      "_id": { "$oid": "675af263bd9b2d735b999e80" },
+      "name": "Văn học Việt Nam",
+      "description": "Những tác phẩm văn học nổi tiếng của các tác giả Việt Nam",
+      "createdAt": { "$date": "2024-12-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-01T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af263bd9b2d735b999e81" },
+      "name": "Văn học thiếu nhi",
+      "description": "Sách dành cho trẻ em và thiếu niên",
+      "createdAt": { "$date": "2024-12-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-01T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af263bd9b2d735b999e82" },
+      "name": "Kỹ năng sống",
+      "description": "Sách về phát triển bản thân và kỹ năng mềm",
+      "createdAt": { "$date": "2024-12-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-01T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af263bd9b2d735b999e83" },
+      "name": "Tiểu thuyết",
+      "description": "Các tác phẩm tiểu thuyết nổi tiếng",
+      "createdAt": { "$date": "2024-12-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-01T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af263bd9b2d735b999e84" },
+      "name": "Văn học hiện đại",
+      "description": "Các tác phẩm văn học đương đại",
+      "createdAt": { "$date": "2024-12-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-01T00:00:00.000Z" }
+    }
+  ],
+  "customers": [
+    {
+      "_id": { "$oid": "675af100bd9b2d735b999e70" },
+      "fullname": "Admin User",
+      "email": "admin@bookstore.com",
+      "address": "123 Admin Street, Hanoi, Vietnam",
+      "phone": "0912345678",
+      "password": "$2a$10$YourHashedPasswordHere123456789012345678901234567890",
+      "isAdmin": true,
+      "createdAt": { "$date": "2024-11-25T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-11-25T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af100bd9b2d735b999e71" },
+      "fullname": "Nguyễn Văn An",
+      "email": "nguyen.van.an@example.com",
+      "address": "456 Trần Hưng Đạo, Hà Nội",
+      "phone": "0987654321",
+      "password": "$2a$10$YourHashedPasswordHere123456789012345678901234567890",
+      "isAdmin": false,
+      "createdAt": { "$date": "2024-11-26T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-11-26T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af100bd9b2d735b999e72" },
+      "fullname": "Trần Thị Bình",
+      "email": "tran.thi.binh@example.com",
+      "address": "789 Lê Lợi, Hồ Chí Minh",
+      "phone": "0901234567",
+      "password": "$2a$10$YourHashedPasswordHere123456789012345678901234567890",
+      "isAdmin": false,
+      "createdAt": { "$date": "2024-11-27T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-11-27T00:00:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675af100bd9b2d735b999e73" },
+      "fullname": "Lê Minh Châu",
+      "email": "le.minh.chau@example.com",
+      "address": "321 Nguyễn Huệ, Đà Nẵng",
+      "phone": "0909876543",
+      "password": "$2a$10$YourHashedPasswordHere123456789012345678901234567890",
+      "isAdmin": false,
+      "createdAt": { "$date": "2024-11-28T00:00:00.000Z" },
+      "updatedAt": { "$date": "2024-11-28T00:00:00.000Z" }
+    }
+  ],
+  "books": [
+    {
+      "_id": { "$oid": "675af468bd9b2d735b999e8f" },
+      "title": "Những Tấm Lòng Cao Cả",
+      "price": 120000,
+      "category": { "$oid": "675af263bd9b2d735b999e80" },
+      "description": "Một tác phẩm văn học kinh điển về tình bạn, tình yêu gia đình, và lòng nhân ái, rất phù hợp cho mọi lứa tuổi, đặc biệt là học sinh.",
+      "image": "nhung-tam-long-cao-ca.jpg",
+      "stock": 50
+    },
+    {
+      "_id": { "$oid": "675af58cbd9b2d735b999e96" },
+      "title": "Cho Tôi Xin Một Vé Đi Tuổi Thơ",
+      "price": 90000,
+      "category": { "$oid": "675af263bd9b2d735b999e81" },
+      "description": "Cuốn sách đưa người đọc trở lại với tuổi thơ đầy trong sáng và mộng mơ, qua lăng kính dí dỏm và sâu sắc của tác giả.",
+      "image": "cho-toi-xin-mot-ve-di-tuoi-tho.jpg",
+      "stock": 80
+    },
+    {
+      "_id": { "$oid": "675af58cbd9b2d735b999e97" },
+      "title": "Đắc Nhân Tâm",
+      "price": 150000,
+      "category": { "$oid": "675af263bd9b2d735b999e82" },
+      "description": "Cuốn sách kỹ năng sống kinh điển, đã được dịch sang tiếng Việt, hướng dẫn cách ứng xử và giao tiếp hiệu quả trong cuộc sống.",
+      "image": "dac_nhan_tam.jpg",
+      "stock": 100
+    },
+    {
+      "_id": { "$oid": "675af58cbd9b2d735b999e98" },
+      "title": "Tôi Thấy Hoa Vàng Trên Cỏ Xanh",
+      "price": 95000,
+      "category": { "$oid": "675af263bd9b2d735b999e83" },
+      "description": "Một tác phẩm văn học giàu cảm xúc, viết về tuổi thơ êm đềm ở làng quê Việt Nam, với những câu chuyện giản dị nhưng sâu sắc.",
+      "image": "Toithayhoavangtrencoxanh.jpg",
+      "stock": 60
+    },
+    {
+      "_id": { "$oid": "675af58cbd9b2d735b999e99" },
+      "title": "Mắt Biếc",
+      "price": 110000,
+      "category": { "$oid": "675af263bd9b2d735b999e84" },
+      "description": "Một câu chuyện tình yêu đẹp nhưng đầy tiếc nuối, đã chạm đến trái tim của nhiều thế hệ độc giả Việt Nam.",
+      "image": "matbiec.jpg",
+      "stock": 70
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee8775e" },
+      "title": "Cô Gái Đến Từ Hôm Qua",
+      "price": 85000,
+      "category": { "$oid": "675af263bd9b2d735b999e80" },
+      "description": "Một câu chuyện về tình bạn, tình yêu, và những ký ức tuổi học trò ngọt ngào.",
+      "image": "cogiaidenthomhqua.jpg",
+      "stock": 100
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee8775f" },
+      "title": "Dế Mèn Phiêu Lưu Ký",
+      "price": 60000,
+      "category": { "$oid": "675af263bd9b2d735b999e81" },
+      "description": "Cuốn sách thiếu nhi nổi tiếng của Tô Hoài về cuộc phiêu lưu của chú dế mèn thông minh và dũng cảm.",
+      "image": "demenphieulunky.jpg",
+      "stock": 150
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87760" },
+      "title": "Số Đỏ",
+      "price": 120000,
+      "category": { "$oid": "675af263bd9b2d735b999e82" },
+      "description": "Cuốn tiểu thuyết của Vũ Trọng Phụng phản ánh sự chao đảo trong xã hội Việt Nam đầu thế kỷ XX.",
+      "image": "sodo.jpg",
+      "stock": 80
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87761" },
+      "title": "Chí Phèo",
+      "price": 95000,
+      "category": { "$oid": "675af263bd9b2d735b999e83" },
+      "description": "Một tác phẩm nổi tiếng của Nam Cao, nói về cuộc đời bi thảm của nhân vật Chí Phèo và các vấn đề xã hội đương thời.",
+      "image": "chipheo.jpg",
+      "stock": 90
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87762" },
+      "title": "Nỗi Buồn Chiến Tranh",
+      "price": 130000,
+      "category": { "$oid": "675af263bd9b2d735b999e84" },
+      "description": "Cuốn sách của Bảo Ninh, mang đến cái nhìn sâu sắc về nỗi đau chiến tranh và những ký ức không thể phai mờ.",
+      "image": "noibuonchientranh.jpg",
+      "stock": 60
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87763" },
+      "title": "Mãi Mãi Tuổi 20",
+      "price": 110000,
+      "category": { "$oid": "675af263bd9b2d735b999e80" },
+      "description": "Cuốn sách kể về những câu chuyện đầy cảm động và sức mạnh của tuổi trẻ, đặc biệt là những người sống trong thời chiến.",
+      "image": "maimaituoi20.jpg",
+      "stock": 70
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87765" },
+      "title": "Lặng Lẽ Sapa",
+      "price": 110000,
+      "category": { "$oid": "675af263bd9b2d735b999e82" },
+      "description": "Một câu chuyện tình yêu và sự hy sinh trong bối cảnh thiên nhiên hoang sơ và con người đậm đà bản sắc dân tộc.",
+      "image": "langlesapa.jpg",
+      "stock": 65
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87766" },
+      "title": "Tắt Đèn",
+      "price": 80000,
+      "category": { "$oid": "675af263bd9b2d735b999e83" },
+      "description": "Tác phẩm của Ngô Tất Tố, phản ánh sự nghèo khổ và đấu tranh của người nông dân trong xã hội phong kiến.",
+      "image": "tatden.jpg",
+      "stock": 110
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87767" },
+      "title": "Mùa Hè Của Thằng Bờm",
+      "price": 75000,
+      "category": { "$oid": "675af263bd9b2d735b999e84" },
+      "description": "Cuốn sách ghi lại những câu chuyện tuổi thơ đáng nhớ của thằng Bờm và những trải nghiệm về cuộc sống.",
+      "image": "muahecuathangbom.jpg",
+      "stock": 130
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87768" },
+      "title": "Tuổi Thơ Dữ Dội",
+      "price": 105000,
+      "category": { "$oid": "675af263bd9b2d735b999e80" },
+      "description": "Những kỷ niệm tuổi thơ đầy màu sắc và cảm xúc của tác giả Phùng Quán.",
+      "image": "tuoithodudoi.jpg",
+      "stock": 85
+    },
+    {
+      "_id": { "$oid": "675b252ea689d7c3bee87769" },
+      "title": "Nhà Giả Kim",
+      "price": 125000,
+      "category": { "$oid": "675af263bd9b2d735b999e82" },
+      "description": "Cuốn sách nổi tiếng của Paulo Coelho về hành trình tìm kiếm kho báu và ý nghĩa cuộc sống.",
+      "image": "nhagiakim.jpg",
+      "stock": 120
+    }
+  ],
+  "orders": [
+    {
+      "_id": { "$oid": "675b300abd9b2d735b999ea0" },
+      "fullname": "Nguyễn Văn An",
+      "phone": "0987654321",
+      "address": "456 Trần Hưng Đạo, Hà Nội",
+      "note": "Giao giờ hành chính",
+      "items": [
+        {
+          "_id": "675af58cbd9b2d735b999e97",
+          "title": "Đắc Nhân Tâm",
+          "price": 150000,
+          "quantity": 2,
+          "image": "/images/dac_nhan_tam.jpg"
+        },
+        {
+          "_id": "675af58cbd9b2d735b999e99",
+          "title": "Mắt Biếc",
+          "price": 110000,
+          "quantity": 1,
+          "image": "/images/matbiec.jpg"
+        }
+      ],
+      "total": 410000,
+      "status": "Delivered",
+      "orderDate": { "$date": "2024-11-28T10:30:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675b300abd9b2d735b999ea1" },
+      "fullname": "Trần Thị Bình",
+      "phone": "0901234567",
+      "address": "789 Lê Lợi, Hồ Chí Minh",
+      "note": "",
+      "items": [
+        {
+          "_id": "675af58cbd9b2d735b999e98",
+          "title": "Tôi Thấy Hoa Vàng Trên Cỏ Xanh",
+          "price": 95000,
+          "quantity": 1,
+          "image": "/images/Toithayhoavangtrencoxanh.jpg"
+        },
+        {
+          "_id": "675b252ea689d7c3bee8775f",
+          "title": "Dế Mèn Phiêu Lưu Ký",
+          "price": 60000,
+          "quantity": 3,
+          "image": "/images/demenphieulunky.jpg"
+        }
+      ],
+      "total": 275000,
+      "status": "Processing",
+      "orderDate": { "$date": "2024-11-29T14:20:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675b300abd9b2d735b999ea2" },
+      "fullname": "Lê Minh Châu",
+      "phone": "0909876543",
+      "address": "321 Nguyễn Huệ, Đà Nẵng",
+      "note": "Gọi trước khi giao",
+      "items": [
+        {
+          "_id": "675b252ea689d7c3bee87769",
+          "title": "Nhà Giả Kim",
+          "price": 125000,
+          "quantity": 1,
+          "image": "/images/nhagiakim.jpg"
+        }
+      ],
+      "total": 125000,
+      "status": "Pending",
+      "orderDate": { "$date": "2024-12-01T09:15:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675b300abd9b2d735b999ea3" },
+      "fullname": "Nguyễn Văn An",
+      "phone": "0987654321",
+      "address": "456 Trần Hưng Đạo, Hà Nội",
+      "note": "",
+      "items": [
+        {
+          "_id": "675b252ea689d7c3bee8775e",
+          "title": "Cô Gái Đến Từ Hôm Qua",
+          "price": 85000,
+          "quantity": 2,
+          "image": "/images/cogiaidenthomhqua.jpg"
+        },
+        {
+          "_id": "675b252ea689d7c3bee87765",
+          "title": "Lặng Lẽ Sapa",
+          "price": 110000,
+          "quantity": 1,
+          "image": "/images/langlesapa.jpg"
+        }
+      ],
+      "total": 280000,
+      "status": "Shipped",
+      "orderDate": { "$date": "2024-12-02T11:45:00.000Z" }
+    }
+  ],
+  "carts": [
+    {
+      "_id": { "$oid": "675b350cbd9b2d735b999eb0" },
+      "customer": { "$oid": "675af100bd9b2d735b999e71" },
+      "items": [
+        {
+          "book": { "$oid": "675b252ea689d7c3bee87768" },
+          "quantity": 1
+        },
+        {
+          "book": { "$oid": "675af58cbd9b2d735b999e97" },
+          "quantity": 2
+        }
+      ],
+      "createdAt": { "$date": "2024-12-03T08:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-03T08:30:00.000Z" }
+    },
+    {
+      "_id": { "$oid": "675b350cbd9b2d735b999eb1" },
+      "customer": { "$oid": "675af100bd9b2d735b999e72" },
+      "items": [
+        {
+          "book": { "$oid": "675b252ea689d7c3bee87769" },
+          "quantity": 1
+        }
+      ],
+      "createdAt": { "$date": "2024-12-03T09:00:00.000Z" },
+      "updatedAt": { "$date": "2024-12-03T09:00:00.000Z" }
+    }
+  ]
+}
+
+
+
+
+
+
+
+

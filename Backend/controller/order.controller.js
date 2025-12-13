@@ -23,10 +23,29 @@ export const createOrder = async (req, res) => {
     }
 };
 
-// Lấy danh sách đơn hàng
+// Lấy danh sách đơn hàng (Admin)
 export const getOrders = async (req, res) => {
     try {
         const orders = await Order.find().sort({ orderDate: -1 });
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Lấy danh sách đơn hàng của user
+export const getMyOrders = async (req, res) => {
+    try {
+        // In the order schema, we don't have customer reference, but we have fullname, phone, address
+        // We'll need to match by email from customer data
+        const customer = req.user;
+        const orders = await Order.find({ 
+            $or: [
+                { phone: customer.phone },
+                { fullname: customer.fullname }
+            ]
+        }).sort({ orderDate: -1 });
+        
         res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });

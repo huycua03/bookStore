@@ -15,26 +15,33 @@ function Login() {
       email: data.email,
       password: data.password,
     };
-    await axios
-      .post("http://localhost:4001/api/login", LoginCustomer)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data) {
-          toast.success("Loggedin Successfully");
-          document.getElementById("my_modal_3").close();
-          setTimeout(() => {
-            window.location.reload();
-            localStorage.setItem("customer", JSON.stringify(res.data.customer));
-          }, 1000);
-        }
-      })
-      .catch((err) => {
-        if (err.response) {
-          
+    
+    try {
+      const res = await axios.post("http://localhost:4001/api/login", LoginCustomer);
+      
+      if (res.data) {
+        toast.success("Logged in Successfully");
+        localStorage.setItem("customer", JSON.stringify({
+          ...res.data.customer,
+          token: res.data.token
+        }));
+        document.getElementById("my_modal_3").close();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.data.requiresActivation) {
+          toast.error("Please activate your account. Check your email for activation link.", {
+            duration: 5000,
+            icon: "📧"
+          });
+        } else {
           toast.error("Error: " + err.response.data.message);
-          setTimeout(() => {}, 2000);
         }
-      });
+      }
+    }
   };
   return (
     <div>

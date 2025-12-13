@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
 import toast from "react-hot-toast";
+import api from "../config/api";
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -14,7 +14,7 @@ function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/api/order");
+      const res = await api.get("/order");
       setOrders(res.data);
       setLoading(false);
     } catch (error) {
@@ -25,7 +25,7 @@ function AdminOrders() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await axios.put(`http://localhost:4001/api/order/${orderId}`, {
+      await api.put(`/order/${orderId}`, {
         status: newStatus
       });
       

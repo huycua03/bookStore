@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
+import api from "../config/api";
 
 function AdminCustomers() {
   const [customers, setCustomers] = useState([]);
@@ -15,7 +15,7 @@ function AdminCustomers() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/api/customer");
+      const res = await api.get("/customer");
       setCustomers(res.data);
       setLoading(false);
     } catch (error) {
@@ -27,7 +27,7 @@ function AdminCustomers() {
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng này?")) {
       try {
-        await axios.delete(`http://localhost:4001/api/customer/${id}`);
+        await api.delete(`/customer/${id}`);
         fetchCustomers();
       } catch (error) {
         console.log(error);

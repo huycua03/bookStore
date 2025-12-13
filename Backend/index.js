@@ -11,6 +11,9 @@ import bookRoute from './route/book.route.js';
 import customerRoute from './route/customer.route.js';
 import orderRoute from './route/order.route.js';
 import paymentRoute from './route/payment.route.js';
+import cartRoute from './route/cart.route.js';
+import reviewRoute from './route/review.route.js';
+import wishlistRoute from './route/wishlist.route.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -38,10 +41,12 @@ mongoose.connect(URI)
 // Định nghĩa các routes
 app.use("/api", bookRoute);
 app.use('/api', categoryRoute);
-app.use('/api', bookRoute);
 app.use('/api', customerRoute);
 app.use('/api', orderRoute);
 app.use('/api', paymentRoute);
+app.use('/api', cartRoute);
+app.use('/api', reviewRoute);
+app.use('/api', wishlistRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
+import api from "../config/api";
 
 function CategoryForm() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function CategoryForm() {
 
   const fetchCategory = async () => {
     try {
-      const res = await axios.get(`http://localhost:4001/api/category/${id}`);
+      const res = await api.get(`/category/${id}`);
       setFormData(res.data);
     } catch (error) {
       console.log(error);
@@ -31,9 +31,9 @@ function CategoryForm() {
     e.preventDefault();
     try {
       if (id) {
-        await axios.put(`http://localhost:4001/api/category/${id}`, formData);
+        await api.put(`/category/${id}`, formData);
       } else {
-        await axios.post("http://localhost:4001/api/category", formData);
+        await api.post("/category", formData);
       }
       navigate("/admin/categories");
     } catch (error) {

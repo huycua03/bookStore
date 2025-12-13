@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import toast from "react-hot-toast";
+import api from "../config/api";
 
 function Checkout() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState("cash"); // "cash" or "vnpay"
+  const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     fullname: "",
     phone: "",
@@ -24,6 +26,10 @@ function Checkout() {
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN').format(price);
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -33,7 +39,16 @@ function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (cartItems.length === 0) {
+      toast.error('Giỏ hàng trống!');
+      return;
+    }
+
+    setIsProcessing(true);
+
     try {
+      // Create order first
       const orderData = {
         ...formData,
         items: cartItems,
@@ -41,16 +56,41 @@ function Checkout() {
         status: "Pending"
       };
 
-      await axios.post("http://localhost:4001/api/order", orderData);
-      
-      localStorage.removeItem('cart');
-      
-      toast.success('Đặt hàng thành công!');
-      
-      navigate("/book");
+      const orderResponse = await api.post("/order", orderData);
+      const orderId = orderResponse.data._id;
+
+      // Handle payment based on selected method
+      if (paymentMethod === "vnpay") {
+        // Create VnPay payment
+        const paymentResponse = await api.post("/payment/vnpay/create", {
+          orderId: orderId,
+          amount: total,
+          orderInfo: `Thanh toan don hang #${orderId}`
+        });
+
+        // Redirect to VnPay
+        window.location.href = paymentResponse.data.paymentUrl;
+      } else {
+        // Cash on delivery - create payment record
+        await api.post("/payment", {
+          orderId: orderId,
+          paymentMethod: "Cash",
+          amount: total
+        });
+
+        localStorage.removeItem('cart');
+        toast.success('Đặt hàng thành công!');
+        navigate("/book");
+      }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Có lỗi xảy ra khi đặt hàng');
+      if (error.response?.status === 401) {
+        toast.error('Vui lòng đăng nhập để đặt hàng');
+        navigate('/');
+      } else {
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi đặt hàng');
+      }
+      setIsProcessing(false);
     }
   };
 
@@ -111,11 +151,56 @@ function Checkout() {
                 />
               </div>
 
+              {/* Payment Method Selection */}
+              <div>
+                <label className="block text-white mb-3 font-semibold">Phương thức thanh toán</label>
+                <div className="space-y-3">
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all bg-gray-800 hover:bg-gray-700"
+                    style={{ borderColor: paymentMethod === 'cash' ? '#ec4899' : '#4b5563' }}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cash"
+                      checked={paymentMethod === "cash"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="mr-3 w-5 h-5 text-pink-500"
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold text-white">💰 Thanh toán khi nhận hàng (COD)</div>
+                      <div className="text-sm text-gray-400">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all bg-gray-800 hover:bg-gray-700"
+                    style={{ borderColor: paymentMethod === 'vnpay' ? '#ec4899' : '#4b5563' }}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="vnpay"
+                      checked={paymentMethod === "vnpay"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="mr-3 w-5 h-5 text-pink-500"
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold text-white">💳 Thanh toán online qua VnPay</div>
+                      <div className="text-sm text-gray-400">Thanh toán an toàn qua cổng VnPay</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600"
+                disabled={isProcessing}
+                className={`w-full px-6 py-3 rounded-lg font-semibold transition-all ${
+                  isProcessing
+                    ? 'bg-gray-500 cursor-not-allowed'
+                    : paymentMethod === 'vnpay'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+                    : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white'
+                }`}
               >
-                Đặt hàng
+                {isProcessing ? 'Đang xử lý...' : paymentMethod === 'vnpay' ? 'Thanh toán qua VnPay' : 'Đặt hàng'}
               </button>
             </form>
           </div>
@@ -128,9 +213,13 @@ function Checkout() {
                 <div key={item._id} className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <img
-                      src={item.image}
+                      src={`http://localhost:4001${item.image}`}
                       alt={item.title}
                       className="w-16 h-16 object-cover rounded"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/64?text=No+Image';
+                      }}
                     />
                     <div>
                       <p className="font-semibold">{item.title}</p>
@@ -140,10 +229,19 @@ function Checkout() {
                   <p>{item.price * item.quantity}Đ</p>
                 </div>
               ))}
-              <div className="border-t pt-4 mt-4">
-                <p className="text-xl font-semibold">
-                  Tổng tiền: {total}Đ
-                </p>
+              <div className="border-t pt-4 mt-4 space-y-2">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <span>Tạm tính:</span>
+                  <span>{formatPrice(total)}₫</span>
+                </div>
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                  <span>Phí vận chuyển:</span>
+                  <span>Miễn phí</span>
+                </div>
+                <div className="flex justify-between text-xl font-bold text-pink-500 dark:text-pink-400 pt-2 border-t">
+                  <span>Tổng tiền:</span>
+                  <span>{formatPrice(total)}₫</span>
+                </div>
               </div>
             </div>
           </div>

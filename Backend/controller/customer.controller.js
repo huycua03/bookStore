@@ -1,42 +1,61 @@
 import Customer from "../model/customer.model.js";
 import bcryptjs from "bcryptjs";
+import crypto from "crypto";
+import { generateToken } from "../middleware/auth.js";
+import { sendActivationEmail, sendWelcomeEmail } from "../services/emailService.js";
 
+/**
+ * Generate unique activation token
+ */
+const generateActivationToken = () => {
+    return crypto.randomBytes(32).toString('hex');
+};
+
+/**
+ * User Registration with Email Activation
+ */
 export const signup = async (req, res) => {
     try {
-        // Lấy dữ liệu từ body request
         const { fullname, phone, email, address, password } = req.body;
 
-        // Kiểm tra xem email đã tồn tại trong CSDL chưa
-        const existingCustomer = await Customer.findOne({ email });
-        if (existingCustomer) {
-            return res.status(400).json({ message: "Customer already exists" });
+        if (!fullname || !phone || !email || !address || !password) {
+            return res.status(400).json({ message: "All fields are required" });
         }
 
-        // Mã hóa mật khẩu
-        const hashedPassword = await bcryptjs.hash(password, 10);
+        const existingCustomer = await Customer.findOne({ email });
+        if (existingCustomer) {
+            return res.status(400).json({ message: "Email already exists" });
+        }
 
-        // Tạo một Customer mới
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        const activationToken = generateActivationToken();
+        const activationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
         const newCustomer = new Customer({
             fullname,
             email,
             address,
             phone,
             password: hashedPassword,
+            isVerified: false,
+            activationToken,
+            activationTokenExpires
         });
 
-        // Lưu customer vào cơ sở dữ liệu
         await newCustomer.save();
 
-        // Trả về kết quả
+        // Send activation email
+        try {
+            await sendActivationEmail(email, activationToken, fullname);
+            console.log(`✅ Activation email sent to: ${email}`);
+        } catch (emailError) {
+            console.error('❌ Error sending activation email:', emailError);
+        }
+
         res.status(201).json({
-            message: "Customer created successfully",
-            customer: {
-                _id: newCustomer._id,
-                fullname: newCustomer.fullname,
-                email: newCustomer.email,
-                address: newCustomer.address,
-                phone: newCustomer.phone,
-            },
+            message: "Registration successful! Please check your email to activate your account.",
+            requiresActivation: true,
+            email: email
         });
     } catch (error) {
         console.log("Error: " + error.message);
@@ -44,6 +63,9 @@ export const signup = async (req, res) => {
     }
 };
 
+/**
+ * Login with verification check
+ */
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -58,16 +80,148 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
+        // Check if account is verified
+        if (!customer.isVerified) {
+            return res.status(403).json({ 
+                message: "Please activate your account. Check your email for activation link.",
+                requiresActivation: true,
+                email: customer.email
+            });
+        }
+
+        const token = generateToken(customer);
+
         res.status(200).json({
             message: "Login successful",
+            token,
             customer: {
                 _id: customer._id,
                 fullname: customer.fullname,
                 email: customer.email,
+                isAdmin: customer.isAdmin,
+                isVerified: customer.isVerified
             },
         });
     } catch (error) {
-        console.log("Login Error:", error);  // Log thêm thông tin chi tiết lỗi
+        console.log("Login Error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+/**
+ * Activate Account via Email Link
+ */
+export const activateAccount = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        if (!token) {
+            return res.status(400).json({ message: "Activation token is required" });
+        }
+
+        const customer = await Customer.findOne({ activationToken: token });
+        
+        if (!customer) {
+            return res.status(404).json({ message: "Invalid activation link" });
+        }
+
+        if (customer.isVerified) {
+            const authToken = generateToken(customer);
+            return res.status(200).json({ 
+                message: "Account already activated",
+                alreadyActivated: true,
+                token: authToken,
+                customer: {
+                    _id: customer._id,
+                    fullname: customer.fullname,
+                    email: customer.email,
+                    isAdmin: customer.isAdmin,
+                    isVerified: true
+                }
+            });
+        }
+
+        if (new Date() > customer.activationTokenExpires) {
+            return res.status(400).json({ 
+                message: "Activation link has expired. Please request a new one." 
+            });
+        }
+
+        customer.isVerified = true;
+        customer.activationToken = undefined;
+        customer.activationTokenExpires = undefined;
+        await customer.save();
+
+        // Send welcome email
+        try {
+            await sendWelcomeEmail(customer.email, customer.fullname);
+            console.log(`✅ Welcome email sent to: ${customer.email}`);
+        } catch (emailError) {
+            console.error('❌ Error sending welcome email:', emailError);
+        }
+
+        const authToken = generateToken(customer);
+
+        res.status(200).json({
+            message: "Account activated successfully! Welcome to BookStore!",
+            token: authToken,
+            customer: {
+                _id: customer._id,
+                fullname: customer.fullname,
+                email: customer.email,
+                address: customer.address,
+                phone: customer.phone,
+                isAdmin: customer.isAdmin,
+                isVerified: customer.isVerified
+            }
+        });
+    } catch (error) {
+        console.error("Activation error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+/**
+ * Resend Activation Link
+ */
+export const resendActivationLink = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        const customer = await Customer.findOne({ email });
+        
+        if (!customer) {
+            return res.status(404).json({ message: "Customer not found" });
+        }
+
+        if (customer.isVerified) {
+            return res.status(400).json({ message: "Account already activated" });
+        }
+
+        const activationToken = generateActivationToken();
+        const activationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        customer.activationToken = activationToken;
+        customer.activationTokenExpires = activationTokenExpires;
+        await customer.save();
+
+        try {
+            await sendActivationEmail(email, activationToken, customer.fullname);
+            console.log(`✅ New activation link sent to: ${email}`);
+        } catch (emailError) {
+            console.error('❌ Error sending activation email:', emailError);
+            return res.status(500).json({ message: "Failed to send activation email" });
+        }
+
+        res.status(200).json({
+            message: "Activation link resent successfully. Please check your email."
+        });
+    } catch (error) {
+        console.error("Resend activation link error:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
@@ -133,13 +287,14 @@ export const createCustomer = async (req, res) => {
         // Mã hóa mật khẩu
         const hashedPassword = await bcryptjs.hash(password, 10);
 
-        // Tạo customer mới
+        // Tạo customer mới (admin-created accounts are auto-verified)
         const customer = new Customer({
             fullname,
             email,
             phone,
             address,
-            password: hashedPassword
+            password: hashedPassword,
+            isVerified: true
         });
 
         await customer.save();

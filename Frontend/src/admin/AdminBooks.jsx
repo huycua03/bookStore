@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import AdminNavbar from "../components/AdminNavbar";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
+import api from "../config/api";
 
 function AdminBooks() {
   const [books, setBooks] = useState([]);
@@ -15,7 +15,7 @@ function AdminBooks() {
 
   const fetchBooks = async () => {
     try {
-      const res = await axios.get("http://localhost:4001/api/book");
+      const res = await api.get("/book");
       setBooks(res.data);
       setLoading(false);
     } catch (error) {
@@ -27,7 +27,7 @@ function AdminBooks() {
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa sách này?")) {
       try {
-        await axios.delete(`http://localhost:4001/api/book/${id}`);
+        await api.delete(`/book/${id}`);
         fetchBooks(); // Refresh danh sách sau khi xóa
       } catch (error) {
         console.log(error);
@@ -67,9 +67,13 @@ function AdminBooks() {
                 <tr key={book._id} className="border-b dark:border-gray-600">
                   <td className="px-6 py-4">
                     <img
-                      src={`/${book.image}`}
+                      src={`http://localhost:4001${book.image}`}
                       alt={book.title}
                       className="w-20 h-20 object-cover rounded"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/80?text=No+Image';
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4">{book.title}</td>
