@@ -17,8 +17,18 @@ export const getWishlist = async (req, res) => {
             });
         }
 
-        res.status(200).json(wishlist);
+        // Format image URLs for books (same as getBooks)
+        const wishlistData = {
+            ...wishlist._doc,
+            books: wishlist.books.map(book => ({
+                ...book._doc,
+                image: book.image ? `/images/${book.image}` : null
+            }))
+        };
+
+        res.status(200).json(wishlistData);
     } catch (error) {
+        console.error("Error getting wishlist:", error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -55,7 +65,16 @@ export const addToWishlist = async (req, res) => {
             populate: { path: 'category' }
         });
 
-        res.status(200).json(wishlist);
+        // Format image URLs for books
+        const wishlistData = {
+            ...wishlist._doc,
+            books: wishlist.books.map(book => ({
+                ...book._doc,
+                image: book.image ? `/images/${book.image}` : null
+            }))
+        };
+
+        res.status(200).json(wishlistData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -82,7 +101,16 @@ export const removeFromWishlist = async (req, res) => {
             populate: { path: 'category' }
         });
 
-        res.status(200).json(wishlist);
+        // Format image URLs for books
+        const wishlistData = {
+            ...wishlist._doc,
+            books: wishlist.books.map(book => ({
+                ...book._doc,
+                image: book.image ? `/images/${book.image}` : null
+            }))
+        };
+
+        res.status(200).json(wishlistData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

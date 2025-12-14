@@ -92,7 +92,7 @@ function ActivateAccount() {
                         </div>
                         <Link 
                             to="/" 
-                            className="inline-block mt-4 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
+                            className="inline-block mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                         >
                             Đi đến trang chủ ngay
                         </Link>
@@ -123,7 +123,7 @@ function ActivateAccount() {
                 <div className="space-y-3">
                     <Link
                         to="/signup"
-                        className="block w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
+                        className="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                     >
                         Đăng ký lại
                     </Link>

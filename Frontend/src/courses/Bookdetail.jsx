@@ -5,6 +5,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Cards from "../components/Cards";
 import toast from "react-hot-toast";
+import api from "../config/api";
+import { useAuth } from "../context/AuthProvider";
 
 function BookDetail() {
   const { id } = useParams();
@@ -14,11 +16,35 @@ function BookDetail() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isCheckingWishlist, setIsCheckingWishlist] = useState(false);
+  const [authUser] = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBookData();
   }, [id]);
+
+  // Check if book is in wishlist
+  useEffect(() => {
+    if (authUser && book?._id) {
+      checkWishlistStatus();
+    }
+  }, [authUser, book?._id]);
+
+  const checkWishlistStatus = async () => {
+    if (!authUser) return;
+    
+    try {
+      setIsCheckingWishlist(true);
+      const res = await api.get(`/wishlist/check/${book._id}`);
+      setIsInWishlist(res.data.inWishlist);
+    } catch (error) {
+      setIsInWishlist(false);
+    } finally {
+      setIsCheckingWishlist(false);
+    }
+  };
 
   const fetchBookData = async () => {
     setLoading(true);
@@ -77,6 +103,34 @@ function BookDetail() {
     if (book.stock === 0) return;
     addToCart();
     setTimeout(() => navigate('/cart'), 500);
+  };
+
+  const toggleWishlist = async () => {
+    if (!authUser) {
+      toast.error('Vui lòng đăng nhập để thêm vào yêu thích');
+      navigate('/');
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await api.delete(`/wishlist/${book._id}`);
+        setIsInWishlist(false);
+        toast.success('Đã xóa khỏi danh sách yêu thích');
+      } else {
+        await api.post('/wishlist', { bookId: book._id });
+        setIsInWishlist(true);
+        toast.success('Đã thêm vào danh sách yêu thích ❤️');
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error);
+      if (error.response?.status === 400 && error.response?.data?.message?.includes('already')) {
+        setIsInWishlist(true);
+        toast.error('Sách đã có trong danh sách yêu thích');
+      } else {
+        toast.error('Không thể cập nhật danh sách yêu thích');
+      }
+    }
   };
 
   const formatPrice = (price) => {
@@ -158,9 +212,43 @@ function BookDetail() {
 
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
-                    {book.title}
-                  </h1>
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white flex-1">
+                      {book.title}
+                    </h1>
+                    {/* Heart Icon for Wishlist */}
+                    <button
+                      onClick={toggleWishlist}
+                      className={`p-3 rounded-full shadow-lg transition-all duration-300 flex-shrink-0 ${
+                        isInWishlist
+                          ? 'bg-pink-500 text-white hover:bg-pink-600'
+                          : 'bg-white dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-slate-600 hover:text-pink-500 border border-gray-200 dark:border-slate-600'
+                      }`}
+                      title={isInWishlist ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
+                    >
+                      {isCheckingWishlist ? (
+                        <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill={isInWishlist ? "currentColor" : "none"}
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                   {book.category && (
                     <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium text-sm">
                       📚 {typeof book.category === 'object' ? book.category.name : book.category}
@@ -168,8 +256,8 @@ function BookDetail() {
                   )}
                 </div>
 
-                <div className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 p-6 rounded-2xl">
-                  <div className="text-4xl font-bold text-pink-600 dark:text-pink-400 mb-3">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl">
+                  <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-3">
                     {formatPrice(book.price)}₫
                   </div>
                   <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${stockStatus.color}`}>
@@ -209,10 +297,10 @@ function BookDetail() {
                   <button 
                     onClick={buyNow}
                     disabled={book.stock === 0}
-                    className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 transform ${
+                    className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 shadow-md hover:shadow-lg ${
                       book.stock === 0
                         ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-lg hover:shadow-2xl hover:-translate-y-1'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                   >
                     {book.stock === 0 ? '🚫 Hết hàng' : '⚡ Mua ngay'}
@@ -221,10 +309,10 @@ function BookDetail() {
                   <button 
                     onClick={addToCart}
                     disabled={book.stock === 0}
-                    className={`w-full py-4 rounded-xl font-bold text-lg border-2 transition-all duration-300 ${
+                    className={`w-full py-4 rounded-xl font-bold text-lg border-2 transition-all duration-200 ${
                       book.stock === 0
                         ? 'border-gray-300 text-gray-400 cursor-not-allowed'
-                        : 'border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white'
+                        : 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
                     }`}
                   >
                     {book.stock === 0 ? 'Tạm hết' : '🛒 Thêm vào giỏ'}

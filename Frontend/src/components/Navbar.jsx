@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Login from "./Login";
 import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
@@ -39,15 +40,15 @@ function Navbar() {
   const navItems = (
     <>
       <li>
-        <a href="/">Home</a>
+        <Link to="/">Home</Link>
       </li>
       <li>
-        <a href="/book">Sách</a>
+        <Link to="/book">Sách</Link>
       </li>
       {authUser && (
         <>
           <li>
-            <a href="/wishlist">
+            <Link to="/wishlist">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -63,10 +64,10 @@ function Navbar() {
                 />
               </svg>
               Yêu thích
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/cart">Giỏ hàng</a>
+            <Link to="/cart">Giỏ hàng</Link>
           </li>
         </>
       )}
@@ -111,7 +112,7 @@ function Navbar() {
                 {navItems}
               </ul>
             </div>
-            <a className=" text-2xl font-bold cursor-pointer">bookStore</a>
+            <Link to="/" className=" text-2xl font-bold cursor-pointer">bookStore</Link>
           </div>
           <div className="navbar-end space-x-3">
             <div className="navbar-center hidden lg:flex">
@@ -186,7 +187,7 @@ function Navbar() {
                       <span>{authUser.fullname}</span>
                     </li>
                     <li>
-                      <a href="/profile">
+                      <Link to="/profile">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-5 w-5"
@@ -202,10 +203,10 @@ function Navbar() {
                           />
                         </svg>
                         Tài khoản
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a href="/order-history">
+                      <Link to="/order-history">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-5 w-5"
@@ -221,11 +222,11 @@ function Navbar() {
                           />
                         </svg>
                         Đơn hàng
-                      </a>
+                      </Link>
                     </li>
                     {authUser.isAdmin && (
                       <li>
-                        <a href="/admin/books">
+                        <Link to="/admin/books">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"
@@ -247,7 +248,7 @@ function Navbar() {
                             />
                           </svg>
                           Quản trị
-                        </a>
+                        </Link>
                       </li>
                     )}
                     <div className="divider my-0"></div>

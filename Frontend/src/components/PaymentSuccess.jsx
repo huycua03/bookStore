@@ -11,6 +11,23 @@ function PaymentSuccess() {
 
   useEffect(() => {
     if (orderId) {
+      // Clear cart when payment is successful
+      const cart = localStorage.getItem('cart');
+      if (cart) {
+        try {
+          const cartItems = JSON.parse(cart);
+          if (cartItems.length > 0) {
+            // Clear the cart
+            localStorage.removeItem('cart');
+            // Dispatch event to update cart count in navbar
+            window.dispatchEvent(new Event('cartUpdated'));
+            console.log('Cart cleared after successful payment');
+          }
+        } catch (error) {
+          console.error('Error clearing cart:', error);
+        }
+      }
+      
       toast.success("Thanh toán thành công!");
     }
   }, [orderId]);
@@ -61,13 +78,13 @@ function PaymentSuccess() {
             <div className="space-y-3">
               <Link
                 to="/book"
-                className="block w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-lg font-semibold transition-all"
+                className="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 Tiếp tục mua sắm
               </Link>
               <button
                 onClick={() => navigate("/")}
-                className="block w-full px-6 py-3 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-all"
+                className="block w-full px-6 py-3 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-all duration-200"
               >
                 Về trang chủ
               </button>

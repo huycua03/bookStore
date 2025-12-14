@@ -52,13 +52,13 @@ function PaymentFailed() {
             <div className="space-y-3">
               <Link
                 to="/checkout"
-                className="block w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-lg font-semibold transition-all"
+                className="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 Thử lại thanh toán
               </Link>
               <button
                 onClick={() => navigate("/cart")}
-                className="block w-full px-6 py-3 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-all"
+                className="block w-full px-6 py-3 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-all duration-200"
               >
                 Quay lại giỏ hàng
               </button>

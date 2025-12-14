@@ -56,19 +56,42 @@ function Checkout() {
         status: "Pending"
       };
 
+      console.log("Creating order with data:", {
+        fullname: orderData.fullname,
+        phone: orderData.phone,
+        address: orderData.address,
+        itemsCount: orderData.items.length,
+        total: orderData.total
+      });
+
       const orderResponse = await api.post("/order", orderData);
+      console.log("Order created response:", orderResponse.data);
+      
+      if (!orderResponse.data || !orderResponse.data._id) {
+        throw new Error("Order không được tạo thành công");
+      }
+      
       const orderId = orderResponse.data._id;
+      console.log("Order ID:", orderId);
 
       // Handle payment based on selected method
       if (paymentMethod === "vnpay") {
         // Create VnPay payment
+        console.log("Creating VnPay payment for order:", orderId);
         const paymentResponse = await api.post("/payment/vnpay/create", {
           orderId: orderId,
           amount: total,
           orderInfo: `Thanh toan don hang #${orderId}`
         });
 
+        console.log("Payment response:", paymentResponse.data);
+        
+        if (!paymentResponse.data || !paymentResponse.data.paymentUrl) {
+          throw new Error("Không thể tạo URL thanh toán VNPAY");
+        }
+
         // Redirect to VnPay
+        // Cart will be cleared in PaymentSuccess component after successful payment
         window.location.href = paymentResponse.data.paymentUrl;
       } else {
         // Cash on delivery - create payment record
@@ -77,10 +100,10 @@ function Checkout() {
           paymentMethod: "Cash",
           amount: total
         });
-
-        localStorage.removeItem('cart');
-        toast.success('Đặt hàng thành công!');
-        navigate("/book");
+      
+      localStorage.removeItem('cart');
+      toast.success('Đặt hàng thành công!');
+      navigate("/book");
       }
     } catch (error) {
       console.error('Error:', error);
@@ -192,12 +215,12 @@ function Checkout() {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className={`w-full px-6 py-3 rounded-lg font-semibold transition-all ${
+                className={`w-full px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg ${
                   isProcessing
-                    ? 'bg-gray-500 cursor-not-allowed'
+                    ? 'bg-gray-500 cursor-not-allowed text-white'
                     : paymentMethod === 'vnpay'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
-                    : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
               >
                 {isProcessing ? 'Đang xử lý...' : paymentMethod === 'vnpay' ? 'Thanh toán qua VnPay' : 'Đặt hàng'}

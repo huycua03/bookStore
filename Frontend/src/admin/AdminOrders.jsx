@@ -7,6 +7,8 @@ import api from "../config/api";
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     fetchOrders();
@@ -21,6 +23,17 @@ function AdminOrders() {
       console.log(error);
       setLoading(false);
     }
+  };
+
+  // Calculate pagination
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentOrders = orders.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleStatusChange = async (orderId, newStatus) => {
@@ -45,6 +58,7 @@ function AdminOrders() {
 
   const statusOptions = [
     'Pending',
+    'Paid',
     'Processing',
     'Shipped',
     'Delivered',
@@ -73,7 +87,7 @@ function AdminOrders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {currentOrders.map((order) => (
                 <tr key={order._id} className="border-b dark:border-gray-600">
                   <td className="px-6 py-4">{order._id}</td>
                   <td className="px-6 py-4">{order.fullname}</td>
@@ -86,6 +100,7 @@ function AdminOrders() {
                       onChange={(e) => handleStatusChange(order._id, e.target.value)}
                       className={`px-2 py-1 rounded border ${
                         order.status === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
+                        order.status === 'Paid' ? 'bg-green-200 text-green-800' :
                         order.status === 'Processing' ? 'bg-blue-200 text-blue-800' :
                         order.status === 'Shipped' ? 'bg-purple-200 text-purple-800' :
                         order.status === 'Delivered' ? 'bg-green-200 text-green-800' :
@@ -106,6 +121,55 @@ function AdminOrders() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex justify-center items-center gap-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                currentPage === 1
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              Trước
+            </button>
+            
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                currentPage === totalPages
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              Sau
+            </button>
+          </div>
+        )}
+
+        <div className="mt-4 text-center text-gray-600 dark:text-gray-400">
+          Trang {currentPage} / {totalPages} - Tổng {orders.length} đơn hàng
         </div>
       </div>
       <Footer />

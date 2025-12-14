@@ -20,14 +20,14 @@ function Banner() {
         
         <div className="w-full md:w-1/2 order-2 md:order-1 space-y-8 animate-fade-in">
           <div className="inline-block">
-            <span className="px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 text-pink-600 dark:text-pink-400 rounded-full text-sm font-semibold">
+            <span className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-semibold">
               📚 Chào mừng đến với BookStore
             </span>
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
             Khám phá thế giới{" "}
-            <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+            <span className="text-blue-600 dark:text-blue-400">
               tri thức
             </span>
             {" "}qua từng trang sách
@@ -64,7 +64,7 @@ function Banner() {
             />
             <button
               type="submit"
-              className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Đăng ký
             </button>
@@ -73,7 +73,7 @@ function Banner() {
           <div className="flex flex-wrap gap-4 pt-4">
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
             >
               <span>Khám phá sách</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@ function Banner() {
 
         <div className="w-full md:w-1/2 order-1 md:order-2 animate-fade-in">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-300/20 to-purple-300/20 dark:from-pink-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl"></div>
+            <div className="absolute inset-0 bg-blue-300/20 dark:bg-blue-500/10 rounded-3xl blur-3xl"></div>
             <img
               src={banner}
               className="relative w-full h-auto max-w-[550px] mx-auto drop-shadow-2xl"

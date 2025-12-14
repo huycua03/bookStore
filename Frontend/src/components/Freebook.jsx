@@ -83,7 +83,7 @@ function Freebook() {
             ⭐ Nổi bật
           </span>
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-blue-600 dark:text-blue-400">
           Sách Đề Xuất
         </h2>
         <p className="text-gray-600 dark:text-gray-300 text-lg">
@@ -118,7 +118,7 @@ function Freebook() {
         <div className="text-center mt-12">
           <Link
             to="/book"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
           >
             <span>Xem tất cả</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

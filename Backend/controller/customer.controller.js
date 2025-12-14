@@ -80,13 +80,20 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-        // Check if account is verified
-        if (!customer.isVerified) {
+        // Check if account is verified (skip for admin accounts)
+        if (!customer.isVerified && !customer.isAdmin) {
             return res.status(403).json({ 
                 message: "Please activate your account. Check your email for activation link.",
                 requiresActivation: true,
                 email: customer.email
             });
+        }
+
+        // Auto-verify admin accounts if not already verified
+        if (customer.isAdmin && !customer.isVerified) {
+            customer.isVerified = true;
+            await customer.save();
+            console.log('Admin account auto-verified:', customer.email);
         }
 
         const token = generateToken(customer);

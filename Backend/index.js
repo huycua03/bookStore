@@ -22,6 +22,7 @@ const __dirname = path.dirname(__filename);
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies (for VNPAY IPN)
 
 // Serve static files
 app.use('/images', express.static(path.join(__dirname, 'public/images')));

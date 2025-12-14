@@ -15,12 +15,23 @@ function Wishlist() {
 
   const fetchWishlist = async () => {
     try {
+      console.log("Fetching wishlist...");
       const res = await api.get("/wishlist");
-      setWishlist(res.data);
+      console.log("Wishlist response:", res.data);
+      const wishlistData = res.data || { books: [] };
+      setWishlist({
+        books: Array.isArray(wishlistData.books) ? wishlistData.books : []
+      });
       setLoading(false);
     } catch (error) {
-      console.error(error);
-      toast.error("Không thể tải danh sách yêu thích");
+      console.error("Error fetching wishlist:", error);
+      console.error("Error response:", error.response);
+      if (error.response?.status === 401) {
+        toast.error("Vui lòng đăng nhập để xem danh sách yêu thích");
+      } else {
+        toast.error(error.response?.data?.message || "Không thể tải danh sách yêu thích");
+      }
+      setWishlist({ books: [] });
       setLoading(false);
     }
   };
@@ -116,7 +127,15 @@ function Wishlist() {
                 <Link to={`/book/${book._id}`}>
                   <figure className="relative">
                     <img
-                      src={`http://localhost:4001${book.image}`}
+                      src={
+                        book.image 
+                          ? (book.image.startsWith('http') 
+                              ? book.image 
+                              : book.image.startsWith('/') 
+                                ? `http://localhost:4001${book.image}`
+                                : `http://localhost:4001/images/${book.image}`)
+                          : 'https://via.placeholder.com/300x400?text=No+Image'
+                      }
                       alt={book.title}
                       className="w-full h-60 object-cover"
                       onError={(e) => {

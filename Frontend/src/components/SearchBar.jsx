@@ -151,7 +151,7 @@ function SearchBar({ onSearch, categories }) {
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg font-semibold"
               >
                 ✓ Áp dụng
               </button>

@@ -4,23 +4,44 @@ import api from "../config/api";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthProvider";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [authUser] = useAuth();
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (authUser) {
+      console.log("User authenticated, fetching orders for:", authUser.email);
+      fetchOrders();
+    } else {
+      console.log("No user authenticated");
+      setLoading(false);
+    }
+  }, [authUser]);
 
   const fetchOrders = async () => {
     try {
+      console.log("Fetching orders...");
       const res = await api.get("/order/my/list");
-      setOrders(res.data);
+      console.log("Orders response:", res.data);
+      console.log("Orders count:", res.data?.length);
+      console.log("Orders data:", JSON.stringify(res.data, null, 2));
+      
+      const ordersData = Array.isArray(res.data) ? res.data : [];
+      console.log("Setting orders:", ordersData.length);
+      setOrders(ordersData);
       setLoading(false);
     } catch (error) {
-      console.error(error);
-      toast.error("Không thể tải lịch sử đơn hàng");
+      console.error("Error fetching orders:", error);
+      console.error("Error response:", error.response);
+      if (error.response?.status === 401) {
+        toast.error("Vui lòng đăng nhập để xem đơn hàng");
+      } else {
+        toast.error(error.response?.data?.message || "Không thể tải lịch sử đơn hàng");
+      }
+      setOrders([]);
       setLoading(false);
     }
   };
@@ -47,6 +68,11 @@ function OrderHistory() {
     return texts[status] || status;
   };
 
+  // Debug: Log orders when they change (must be before any conditional returns)
+  useEffect(() => {
+    console.log("Orders state updated:", orders.length, orders);
+  }, [orders]);
+
   if (loading) {
     return (
       <>
@@ -63,10 +89,28 @@ function OrderHistory() {
     <>
       <Navbar />
       <div className="min-h-screen container mx-auto px-4 md:px-20 py-10 mt-20">
-        <h1 className="text-3xl font-bold mb-8">Lịch sử đơn hàng</h1>
+        <h1 className="text-3xl font-bold mb-8">
+          Lịch sử đơn hàng {orders.length > 0 && `(${orders.length})`}
+        </h1>
 
-        {orders.length === 0 ? (
+        {!loading && orders.length === 0 ? (
           <div className="text-center py-12">
+            <div className="mb-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-24 w-24 mx-auto text-gray-400 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+            </div>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
               Bạn chưa có đơn hàng nào
             </p>
@@ -77,7 +121,7 @@ function OrderHistory() {
               Mua sắm ngay
             </Link>
           </div>
-        ) : (
+        ) : !loading && orders.length > 0 ? (
           <div className="space-y-6">
             {orders.map((order) => (
               <div 
@@ -110,9 +154,21 @@ function OrderHistory() {
                   <div className="divider"></div>
                   <div className="space-y-3">
                     {order.items.map((item, index) => (
-                      <div key={index} className="flex items-center gap-4">
+                      <Link
+                        key={index}
+                        to={`/book/${item._id || item.bookId || index}`}
+                        className="flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors"
+                      >
                         <img
-                          src={`http://localhost:4001${item.image}`}
+                          src={
+                            item.image 
+                              ? (item.image.startsWith('http') 
+                                  ? item.image 
+                                  : item.image.startsWith('/') 
+                                    ? `http://localhost:4001${item.image}`
+                                    : `http://localhost:4001/images/${item.image}`)
+                              : 'https://via.placeholder.com/64?text=No+Image'
+                          }
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded"
                           onError={(e) => {
@@ -121,7 +177,9 @@ function OrderHistory() {
                           }}
                         />
                         <div className="flex-1">
-                          <p className="font-semibold">{item.title}</p>
+                          <p className="font-semibold hover:text-pink-500 dark:hover:text-pink-400 transition-colors">
+                            {item.title}
+                          </p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             {item.quantity} x {item.price.toLocaleString()}đ
                           </p>
@@ -129,7 +187,7 @@ function OrderHistory() {
                         <p className="font-semibold">
                           {(item.quantity * item.price).toLocaleString()}đ
                         </p>
-                      </div>
+                      </Link>
                     ))}
                   </div>
 
@@ -159,7 +217,7 @@ function OrderHistory() {
               </div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
       <Footer />
     </>

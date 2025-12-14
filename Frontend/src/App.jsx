@@ -18,6 +18,9 @@ import AdminOrders from "./admin/AdminOrders";
 import ActivateAccount from "./components/ActivateAccount";
 import PaymentSuccess from "./components/PaymentSuccess";
 import PaymentFailed from "./components/PaymentFailed";
+import UserProfile from "./components/UserProfile";
+import OrderHistory from "./components/OrderHistory";
+import Wishlist from "./components/Wishlist";
 
 function App() {
   const [authUser, setAuthUser] = useAuth();
@@ -48,6 +51,9 @@ function App() {
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/failed" element={<PaymentFailed />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/order-history" element={<OrderHistory />} />
+          <Route path="/wishlist" element={<Wishlist />} />
         </Routes>
         <Toaster />
       </div>

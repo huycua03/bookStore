@@ -1,9 +1,37 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import api from "../config/api";
+import { useAuth } from "../context/AuthProvider";
 
 function Cards({ item }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isCheckingWishlist, setIsCheckingWishlist] = useState(false);
+  const [authUser] = useAuth();
+  const navigate = useNavigate();
+
+  // Check if book is in wishlist
+  useEffect(() => {
+    if (authUser && item?._id) {
+      checkWishlistStatus();
+    }
+  }, [authUser, item?._id]);
+
+  const checkWishlistStatus = async () => {
+    if (!authUser) return;
+    
+    try {
+      setIsCheckingWishlist(true);
+      const res = await api.get(`/wishlist/check/${item._id}`);
+      setIsInWishlist(res.data.inWishlist);
+    } catch (error) {
+      // If error, assume not in wishlist
+      setIsInWishlist(false);
+    } finally {
+      setIsCheckingWishlist(false);
+    }
+  };
 
   const addToCart = (e) => {
     e.preventDefault();
@@ -30,6 +58,37 @@ function Cards({ item }) {
     window.dispatchEvent(new Event('cartUpdated'));
     
     toast.success('✓ Đã thêm vào giỏ hàng!', { duration: 2000 });
+  };
+
+  const toggleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!authUser) {
+      toast.error('Vui lòng đăng nhập để thêm vào yêu thích');
+      navigate('/');
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await api.delete(`/wishlist/${item._id}`);
+        setIsInWishlist(false);
+        toast.success('Đã xóa khỏi danh sách yêu thích');
+      } else {
+        await api.post('/wishlist', { bookId: item._id });
+        setIsInWishlist(true);
+        toast.success('Đã thêm vào danh sách yêu thích ❤️');
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error);
+      if (error.response?.status === 400 && error.response?.data?.message?.includes('already')) {
+        setIsInWishlist(true);
+        toast.error('Sách đã có trong danh sách yêu thích');
+      } else {
+        toast.error('Không thể cập nhật danh sách yêu thích');
+      }
+    }
   };
 
   const formatPrice = (price) => {
@@ -68,10 +127,42 @@ function Cards({ item }) {
             isHovered ? 'opacity-100' : 'opacity-0'
           }`}></div>
 
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${stockStatus.color}`}>
               {stockStatus.text}
             </span>
+            {/* Heart Icon for Wishlist */}
+            <button
+              onClick={toggleWishlist}
+              className={`p-2 rounded-full shadow-lg transition-all duration-300 ${
+                isInWishlist
+                  ? 'bg-pink-500 text-white hover:bg-pink-600'
+                  : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-slate-700 hover:text-pink-500'
+              }`}
+              title={isInWishlist ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}
+            >
+              {isCheckingWishlist ? (
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill={isInWishlist ? "currentColor" : "none"}
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+              )}
+            </button>
           </div>
 
           <div className={`absolute bottom-3 left-1/2 transform -translate-x-1/2 transition-all duration-300 ${
@@ -97,10 +188,10 @@ function Cards({ item }) {
           <button 
             onClick={addToCart}
             disabled={item.stock === 0}
-            className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 transform ${
+            className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg ${
               item.stock === 0
                 ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-md hover:shadow-xl hover:-translate-y-1'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             {item.stock === 0 ? '🚫 Hết hàng' : '🛒 Thêm vào giỏ'}

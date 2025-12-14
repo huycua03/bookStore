@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import api from "../config/api";
 import Navbar from "./Navbar";
@@ -17,12 +18,15 @@ function UserProfile() {
 
   useEffect(() => {
     if (authUser) {
+      console.log("Auth user data:", authUser);
       setFormData({
         fullname: authUser.fullname || "",
         email: authUser.email || "",
         phone: authUser.phone || "",
         address: authUser.address || ""
       });
+    } else {
+      console.log("No auth user found");
     }
   }, [authUser]);
 
@@ -44,12 +48,32 @@ function UserProfile() {
       localStorage.setItem("customer", JSON.stringify(updatedUser));
       
       setIsEditing(false);
-      window.location.reload();
+      // Reload to update auth context
+      setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       console.error(error);
-      toast.error("Không thể cập nhật thông tin");
+      toast.error(error.response?.data?.message || "Không thể cập nhật thông tin");
     }
   };
+
+  if (!authUser) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+              Vui lòng đăng nhập để xem thông tin
+            </p>
+            <Link to="/" className="btn btn-primary">
+              Đăng nhập
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -99,8 +123,8 @@ function UserProfile() {
                       required
                     />
                   ) : (
-                    <p className="p-3 bg-base-200 rounded-lg">
-                      {formData.fullname}
+                    <p className="p-3 bg-base-200 dark:bg-slate-700 rounded-lg">
+                      {formData.fullname || <span className="text-gray-400">Chưa có thông tin</span>}
                     </p>
                   )}
                 </div>
@@ -110,8 +134,8 @@ function UserProfile() {
                   <label className="label">
                     <span className="label-text font-semibold">Email</span>
                   </label>
-                  <p className="p-3 bg-base-200 rounded-lg">
-                    {formData.email}
+                  <p className="p-3 bg-base-200 dark:bg-slate-700 rounded-lg">
+                    {formData.email || <span className="text-gray-400">Chưa có thông tin</span>}
                   </p>
                   <label className="label">
                     <span className="label-text-alt text-gray-500">
@@ -135,8 +159,8 @@ function UserProfile() {
                       required
                     />
                   ) : (
-                    <p className="p-3 bg-base-200 rounded-lg">
-                      {formData.phone}
+                    <p className="p-3 bg-base-200 dark:bg-slate-700 rounded-lg">
+                      {formData.phone || <span className="text-gray-400">Chưa có thông tin</span>}
                     </p>
                   )}
                 </div>
@@ -156,8 +180,8 @@ function UserProfile() {
                       required
                     />
                   ) : (
-                    <p className="p-3 bg-base-200 rounded-lg">
-                      {formData.address}
+                    <p className="p-3 bg-base-200 dark:bg-slate-700 rounded-lg">
+                      {formData.address || <span className="text-gray-400">Chưa có thông tin</span>}
                     </p>
                   )}
                 </div>
@@ -203,7 +227,7 @@ function UserProfile() {
 
           {/* Quick Links */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <a href="/order-history" className="card bg-base-100 shadow-xl hover:shadow-2xl transition dark:bg-slate-800">
+            <Link to="/order-history" className="card bg-base-100 shadow-xl hover:shadow-2xl transition dark:bg-slate-800 cursor-pointer">
               <div className="card-body items-center text-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -222,9 +246,9 @@ function UserProfile() {
                 <h2 className="card-title">Đơn hàng</h2>
                 <p className="text-sm">Xem lịch sử mua hàng</p>
               </div>
-            </a>
+            </Link>
 
-            <a href="/wishlist" className="card bg-base-100 shadow-xl hover:shadow-2xl transition dark:bg-slate-800">
+            <Link to="/wishlist" className="card bg-base-100 shadow-xl hover:shadow-2xl transition dark:bg-slate-800 cursor-pointer">
               <div className="card-body items-center text-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -243,9 +267,9 @@ function UserProfile() {
                 <h2 className="card-title">Yêu thích</h2>
                 <p className="text-sm">Sách đã lưu</p>
               </div>
-            </a>
+            </Link>
 
-            <a href="/cart" className="card bg-base-100 shadow-xl hover:shadow-2xl transition dark:bg-slate-800">
+            <Link to="/cart" className="card bg-base-100 shadow-xl hover:shadow-2xl transition dark:bg-slate-800 cursor-pointer">
               <div className="card-body items-center text-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +288,7 @@ function UserProfile() {
                 <h2 className="card-title">Giỏ hàng</h2>
                 <p className="text-sm">Xem giỏ hàng</p>
               </div>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

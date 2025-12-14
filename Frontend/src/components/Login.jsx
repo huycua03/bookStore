@@ -1,9 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
 function Login() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -26,9 +27,18 @@ function Login() {
           token: res.data.token
         }));
         document.getElementById("my_modal_3").close();
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        
+        // Check if user is admin, redirect to admin page
+        if (res.data.customer.isAdmin) {
+          setTimeout(() => {
+            navigate("/admin/books");
+          }, 500);
+        } else {
+          // Regular user: reload to update UI
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
       }
     } catch (err) {
       if (err.response) {
